@@ -22,36 +22,57 @@ public with sharing class NextStepBatch implements Database.Batchable<sObject>{
 
     public Database.QueryLocator start(Database.BatchableContext bc){
         // Query for all accounts and return the query locator.
-        return null; // Update null with the query locator
+        Database.QueryLocator locate = Database.getQueryLocator([SELECT Id, Name, Next_Step__c FROM Account]);
+        // Return the query locator
+        return locate; 
     }
     
     public void execute(Database.BatchableContext bc, List<Account> scope){
         final String BATCH_NEXT_STEP = 'Batching the next meetings together.';
+        Set<Id> accountIds = new Set<Id>();
 
         // Update the Next Step field on each record in the batch scope.
-
-        // Loop through the scope account records
-
-            // Set the Next Step field to 'Batching the next meetings together.'
+        if (!scope.isEmpty()) {
+            for (Account a : scope) {
+                // Set the Next Step field to 'Batching the next meetings together.'
+                a.Next_Step__c = BATCH_NEXT_STEP;
+                accountIds.add(a.Id);
+            }
+        }
 
         // Update the account records in this batch scope
-        
+        update scope;
+
         // Query for all opportunities related to the accounts in this batch scope
+        List<Opportunity> oppList = [SELECT Id, Name, NextStep FROM Opportunity WHERE AccountId IN :accountIds];
 
+        if (!oppList.isEmpty()) { 
         // Loop through the opportunity records
-
-            // Set the Next Step field to 'Batching the next meetings together.'
+            for (Opportunity opp : oppList) {
+                // Set the Next Step field to 'Batching the next meetings together.'
+                opp.NextStep = BATCH_NEXT_STEP;
+            }
+        }
 
         // Update the opportunity records
-
+        update oppList;
     }
     
     public void finish(Database.BatchableContext bc){
+        // Create empty set to hold emails
+        Set<String> emails = new Set<String>();
+        // Get all active users
         final List<User> USERS = [SELECT Id, Name, Email FROM User WHERE IsActive = true AND (NOT Email LIKE 'autoproc%')]; // DO NOT CHANGE
 
         // Get the email addresses of all active users
+        for (User u : USERS) {
+            emails.add(u.Email);
+        }
 
+        if (!USERS.isEmpty()) {
             // Pass the set of active user emails to the sendEmailToActiveUsers method
+            sendEmailToActiveUsers(emails);
+        }
     }
 
     // Helper method to send an email to all emails in the set
