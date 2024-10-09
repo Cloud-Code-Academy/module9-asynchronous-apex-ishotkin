@@ -29,21 +29,23 @@ public with sharing class NextStepFuture {
      */
     @future
     public static void updateNextStep(){
-        // Create empty list to hold the records to update
-        List<SObject> updateRecords = new List<SObject>();
+        // Create empty lists to hold the records to update
+        List<Account> accountList = new List<Account>();
+        List<Opportunity> oppList = new List<Opportunity>();
 
         // Update all Next Step values and add the record to a list
         for (Account a : [SELECT Id, Name, Next_Step__c FROM Account]) {
             a.Next_Step__c = 'Meeting in the future';
-            updateRecords.add(a);
+            accountList.add(a);
         }
         for (Opportunity opp : [SELECT Id, Name, NextStep FROM Opportunity]) {
             opp.NextStep = 'Meeting in the future';
-            updateRecords.add(opp);
+            oppList.add(opp);
         }
 
         // Update the records
-        update updateRecords;
+        update accountList;
+        update oppList;
     }
 
     /*
