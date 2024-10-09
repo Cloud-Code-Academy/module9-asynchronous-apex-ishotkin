@@ -29,10 +29,10 @@ public with sharing class NextStepFuture {
      */
     @future
     public static void updateNextStep(){
-        //Create empty list to hold the records to update
+        // Create empty list to hold the records to update
         List<SObject> updateRecords = new List<SObject>();
 
-        //Update all Next Step values
+        // Update all Next Step values and add the record to a list
         for (Account a : [SELECT Id, Name, Next_Step__c FROM Account]) {
             a.Next_Step__c = 'Meeting in the future';
             updateRecords.add(a);
@@ -54,9 +54,11 @@ public with sharing class NextStepFuture {
     */
     //Mix DML Error happens when you try to perform DML operations on setup and non-setup objects in a single transaction.
     public static void createDealAndUpdateRole() {
+        // Create a new Opportunity to insert with helper method
         Opportunity bigDeal = new Opportunity();
         insertBigDeal(bigDeal);
 
+        // Call a helper method to pdate the User role name
         updateUserRoleName();
     }
 

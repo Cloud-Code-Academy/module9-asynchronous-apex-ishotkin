@@ -28,7 +28,9 @@ public with sharing class NextStepBatch implements Database.Batchable<sObject>{
     }
     
     public void execute(Database.BatchableContext bc, List<Account> scope){
+        // Constant to use to update text fields
         final String BATCH_NEXT_STEP = 'Batching the next meetings together.';
+        // Create empty list to hold the accountIds for SOQL search below
         Set<Id> accountIds = new Set<Id>();
 
         // Update the Next Step field on each record in the batch scope.
@@ -36,6 +38,7 @@ public with sharing class NextStepBatch implements Database.Batchable<sObject>{
             for (Account a : scope) {
                 // Set the Next Step field to 'Batching the next meetings together.'
                 a.Next_Step__c = BATCH_NEXT_STEP;
+                // Save the Account Id for later 
                 accountIds.add(a.Id);
             }
         }
