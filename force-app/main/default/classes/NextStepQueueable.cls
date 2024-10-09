@@ -53,7 +53,7 @@ public with sharing class NextStepQueueable implements Queueable{
         update accounts.values();
 
         // Get the opportunities related to the accounts
-        List<Opportunity> oppList = [SELECT Id, Name, NextStep FROM Opportunity];
+        List<Opportunity> oppList = [SELECT Id, Name, NextStep FROM Opportunity WHERE AccountId IN :accounts.keySet()];
 
         for (Opportunity opp : oppList) {
             // Remove the Next Step using the helper method
